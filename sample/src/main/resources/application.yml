@@ -201,7 +201,7 @@ silas:
 
 
       # 与 Pilot / 推流端实际地址一致；无端口时默认 1935
-      rtmp-url: rtmp://172.18.17.34:1935/live/test/1776334209154
+      rtmp-url: rtmp://172.18.17.34:1935/live/test/123
       topic: silas/live/image
       interval-ms: 1000
       initial-delay-ms: 5000

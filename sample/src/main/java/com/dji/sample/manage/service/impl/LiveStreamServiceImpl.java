@@ -217,7 +217,7 @@ public class LiveStreamServiceImpl implements ILiveStreamService {
                 return agoraUrl.setSn(videoId.getDroneSn());
             case RTMP:
                 LivestreamRtmpUrl rtmpUrl = (LivestreamRtmpUrl) url.clone();
-                return rtmpUrl.setUrl(rtmpUrl.getUrl() + videoId.getDroneSn() + "-" + videoId.getPayloadIndex().toString());
+                return rtmpUrl.setUrl(rtmpUrl.getUrl() + "123");
             case GB28181:
                 String random = String.valueOf(Math.abs(videoId.getDroneSn().hashCode()) % 1000);
                 LivestreamGb28181Url gbUrl = (LivestreamGb28181Url) url.clone();
