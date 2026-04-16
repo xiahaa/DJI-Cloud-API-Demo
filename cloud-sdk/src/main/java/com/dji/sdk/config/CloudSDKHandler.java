@@ -51,6 +51,10 @@ public class CloudSDKHandler {
         if (null == response) {
             throw new CloudSDKException(CloudSDKErrorEnum.INVALID_PARAMETER, "The return value cannot be null.");
         }
+        // Error responses often omit data; do not substitute an empty BaseModel (e.g. StsCredentialsResponse) and validate it.
+        if (response.getCode() != HttpResultResponse.CODE_SUCCESS) {
+            return;
+        }
         Method method = ((MethodSignature) point.getSignature()).getMethod();
         if (method.getGenericReturnType() instanceof Class) {
             if (null == response.getData()) {

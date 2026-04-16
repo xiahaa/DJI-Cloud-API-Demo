@@ -45,8 +45,10 @@ public class MqttConfiguration {
      */
     @Bean
     public MqttPahoMessageDrivenChannelAdapter mqttInbound() {
+        String clientId = "dji-cloud-inbound-" + UUID.randomUUID();
         MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter(
-                UUID.randomUUID().toString(), mqttClientFactory, inboundTopic.split(","));
+                clientId, mqttClientFactory, inboundTopic.split(","));
+        log.info("[MQTT][link] inbound adapter clientId={} topics={}", clientId, inboundTopic);
         DefaultPahoMessageConverter converter = new DefaultPahoMessageConverter();
         // use byte types uniformly
         converter.setPayloadAsBytes(true);
@@ -63,8 +65,10 @@ public class MqttConfiguration {
     @Bean
     @ServiceActivator(inputChannel = ChannelName.OUTBOUND)
     public MessageHandler mqttOutbound() {
+        String clientId = "dji-cloud-outbound-" + UUID.randomUUID();
         MqttPahoMessageHandler messageHandler = new MqttPahoMessageHandler(
-                UUID.randomUUID().toString(), mqttClientFactory);
+                clientId, mqttClientFactory);
+        log.info("[MQTT][link] outbound handler clientId={}", clientId);
         DefaultPahoMessageConverter converter = new DefaultPahoMessageConverter();
         // use byte types uniformly
         converter.setPayloadAsBytes(true);

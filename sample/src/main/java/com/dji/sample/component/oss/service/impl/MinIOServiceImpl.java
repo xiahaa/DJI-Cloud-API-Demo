@@ -45,8 +45,10 @@ public class MinIOServiceImpl implements IOssService {
             Credentials credential = provider.fetch();
             return new CredentialsToken(credential.accessKey(), credential.secretKey(), credential.sessionToken(), OssConfiguration.expire);
         } catch (NoSuchAlgorithmException e) {
-            log.debug("Failed to obtain sts.");
-            e.printStackTrace();
+            log.warn("MinIO STS: NoSuchAlgorithmException, endpoint={}", OssConfiguration.endpoint, e);
+        } catch (Exception e) {
+            // 连接失败、STS 未开、403 等都会走这里；原先未捕获会向上抛，storage_config_get 可能把 MQTT 处理链打崩
+            log.error("MinIO STS failed (check MinIO 可达、桶存在、STS/AssumeRole 可用), endpoint={}", OssConfiguration.endpoint, e);
         }
         return null;
     }
@@ -114,10 +116,15 @@ public class MinIOServiceImpl implements IOssService {
         if (Objects.nonNull(this.client)) {
             return;
         }
-        this.client = MinioClient.builder()
-                .endpoint(OssConfiguration.endpoint)
-                .credentials(OssConfiguration.accessKey, OssConfiguration.secretKey)
-                .region(OssConfiguration.region)
-                .build();
+        try {
+            this.client = MinioClient.builder()
+                    .endpoint(OssConfiguration.endpoint)
+                    .credentials(OssConfiguration.accessKey, OssConfiguration.secretKey)
+                    .region(OssConfiguration.region)
+                    .build();
+        } catch (Exception e) {
+            log.error("MinIO client init failed, endpoint={}", OssConfiguration.endpoint, e);
+            throw e;
+        }
     }
 }

@@ -9,6 +9,7 @@ import com.dji.sdk.cloudapi.storage.StsCredentialsResponse;
 import com.dji.sdk.mqtt.MqttReply;
 import com.dji.sdk.mqtt.requests.TopicRequestsRequest;
 import com.dji.sdk.mqtt.requests.TopicRequestsResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
  * @date 2022/3/9
  */
 @Service
+@Slf4j
 public class StorageServiceImpl extends AbstractMediaService implements IStorageService {
 
     @Autowired
@@ -26,10 +28,17 @@ public class StorageServiceImpl extends AbstractMediaService implements IStorage
 
     @Override
     public StsCredentialsResponse getSTSCredentials() {
+        if (!OssConfiguration.enable) {
+            throw new IllegalStateException("OSS is disabled (oss.enable=false); enable and configure OSS to obtain STS credentials.");
+        }
+        var credentials = ossService.getCredentials();
+        if (credentials == null) {
+            throw new IllegalStateException("OSS temporary credentials unavailable (provider returned null).");
+        }
         return new StsCredentialsResponse()
                 .setEndpoint(OssConfiguration.endpoint)
                 .setBucket(OssConfiguration.bucket)
-                .setCredentials(ossService.getCredentials())
+                .setCredentials(credentials)
                 .setProvider(OssConfiguration.provider)
                 .setObjectKeyPrefix(OssConfiguration.objectDirPrefix)
                 .setRegion(OssConfiguration.region);
@@ -37,6 +46,15 @@ public class StorageServiceImpl extends AbstractMediaService implements IStorage
 
     @Override
     public TopicRequestsResponse<MqttReply<StsCredentialsResponse>> storageConfigGet(TopicRequestsRequest<StorageConfigGet> response, MessageHeaders headers) {
-        return new TopicRequestsResponse<MqttReply<StsCredentialsResponse>>().setData(MqttReply.success(getSTSCredentials()));
+        try {
+            TopicRequestsResponse<MqttReply<StsCredentialsResponse>> out = new TopicRequestsResponse<MqttReply<StsCredentialsResponse>>()
+                    .setData(MqttReply.success(getSTSCredentials()));
+            log.info("[MQTT][link] storage_config_get success (reply issued)");
+            return out;
+        } catch (Exception e) {
+            log.error("[MQTT][link] storage_config_get failed (reply=MqttReply.error; device may retry)", e);
+            return new TopicRequestsResponse<MqttReply<StsCredentialsResponse>>()
+                    .setData(MqttReply.error("storage_config_get failed: " + e.getMessage()));
+        }
     }
 }

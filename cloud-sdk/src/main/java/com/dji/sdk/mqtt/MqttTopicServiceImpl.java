@@ -41,13 +41,13 @@ public class MqttTopicServiceImpl implements IMqttTopicService {
         if (topicSet.contains(topic)) {
             return;
         }
-        log.debug("subscribe topic: {}", topic);
+        log.info("[MQTT][topic] subscribe qos={} topic={}", qos, topic);
         adapter.addTopic(topic, qos);
     }
 
     @Override
     public void unsubscribe(String... topics) {
-        log.debug("unsubscribe topic: {}", Arrays.toString(topics));
+        log.info("[MQTT][topic] unsubscribe topics={}", Arrays.toString(topics));
         adapter.removeTopic(topics);
     }
 

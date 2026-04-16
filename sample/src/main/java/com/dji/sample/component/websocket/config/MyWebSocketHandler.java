@@ -8,6 +8,7 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.TextMessage;
 
 import java.security.Principal;
 
@@ -34,6 +35,7 @@ public class MyWebSocketHandler extends WebSocketDefaultHandler {
             webSocketManageService.put(principal.getName(), new MyConcurrentWebSocketSession(session));
             log.debug("{} is connected. ID: {}. WebSocketSession[current count: {}]",
                     principal.getName(), session.getId(), webSocketManageService.getConnectedCount());
+            getDelegate().afterConnectionEstablished(session);
             return;
         }
         session.close();
@@ -47,12 +49,21 @@ public class MyWebSocketHandler extends WebSocketDefaultHandler {
             log.debug("{} is disconnected. ID: {}. WebSocketSession[current count: {}]",
                     principal.getName(), session.getId(), webSocketManageService.getConnectedCount());
         }
-
+        getDelegate().afterConnectionClosed(session, closeStatus);
     }
 
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
+        if (message instanceof TextMessage) {
+            String text = ((TextMessage) message).getPayload();
+            if ("ping".equalsIgnoreCase(text.trim())) {
+                session.sendMessage(new TextMessage("pong"));
+                log.debug("received message: ping, replied pong");
+                return;
+            }
+        }
         log.debug("received message: {}", message.getPayload());
+        getDelegate().handleMessage(session, message);
     }
 
 }

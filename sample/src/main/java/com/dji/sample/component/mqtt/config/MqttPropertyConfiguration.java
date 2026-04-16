@@ -38,7 +38,7 @@ public class MqttPropertyConfiguration {
      * Get the configuration options of the basic link of the mqtt client.
      * @return
      */
-    static MqttClientOptions getBasicClientOptions() {
+    public static MqttClientOptions getBasicClientOptions() {
         if (!mqtt.containsKey(MqttUseEnum.BASIC)) {
             throw new Error("Please configure the basic mqtt connection parameters first, otherwise application cannot be started.");
         }

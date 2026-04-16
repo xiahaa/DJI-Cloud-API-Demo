@@ -12,7 +12,7 @@ import java.util.Arrays;
  */
 public enum GatewayTypeEnum {
 
-    RC(DeviceEnum.RC, DeviceEnum.RC_PLUS, DeviceEnum.RC_PRO),
+    RC(DeviceEnum.RC, DeviceEnum.RC_PLUS, DeviceEnum.RC_PRO, DeviceEnum.RC_PLUS_2),
 
     DOCK(DeviceEnum.DOCK),
 

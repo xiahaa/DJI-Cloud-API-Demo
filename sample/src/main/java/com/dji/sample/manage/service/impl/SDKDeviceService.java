@@ -19,6 +19,7 @@ import com.dji.sdk.common.SDKManager;
 import com.dji.sdk.mqtt.MqttReply;
 import com.dji.sdk.mqtt.osd.TopicOsdRequest;
 import com.dji.sdk.mqtt.state.TopicStateRequest;
+import com.dji.sdk.mqtt.state.TopicStateResponse;
 import com.dji.sdk.mqtt.status.TopicStatusRequest;
 import com.dji.sdk.mqtt.status.TopicStatusResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -339,6 +340,114 @@ public class SDKDeviceService extends AbstractDeviceService {
                                 .sn(p.getSn())
                                 .deviceSn(request.getFrom())
                                 .build()).collect(Collectors.toList()));
+    }
+
+    @Override
+    public void rcLiveStatusUpdate(TopicStateRequest<RcLiveStatus> request, MessageHeaders headers) {
+        if (request.getData() == null || request.getData().getLiveStatus() == null) {
+            return;
+        }
+        log.debug("RC live status: gateway={}, from={}, {}", request.getGateway(), request.getFrom(), request.getData());
+    }
+
+    @Override
+    public void rcCloudControlAuthUpdate(TopicStateRequest<RcCloudControlAuthState> request, MessageHeaders headers) {
+        if (request.getData() == null) {
+            return;
+        }
+        log.debug("RC cloud_control_auth: gateway={}, from={}, {}", request.getGateway(), request.getFrom(), request.getData());
+    }
+
+    @Override
+    public void rcPsdkWidgetValuesUpdate(TopicStateRequest<RcPsdkWidgetValuesState> request, MessageHeaders headers) {
+        if (request.getData() == null) {
+            return;
+        }
+        log.debug("RC psdk_widget_values: gateway={}, from={}, {}", request.getGateway(), request.getFrom(), request.getData());
+    }
+
+    @Override
+    public TopicStateResponse<MqttReply> dongleInfos(TopicStateRequest<DongleInfos> request, MessageHeaders headers) {
+        log.debug("dongle_infos state: gateway={}, from={}, data={}", request.getGateway(), request.getFrom(), request.getData());
+        return new TopicStateResponse<>();
+    }
+
+    @Override
+    public void rcDroneWpmzVersionUpdate(TopicStateRequest<RcDroneWpmzVersion> request, MessageHeaders headers) {
+        if (request.getData() == null) {
+            return;
+        }
+        log.debug("RC wpmz_version: gateway={}, from={}, {}", request.getGateway(), request.getFrom(), request.getData());
+    }
+
+    @Override
+    public void rcIsBeidouVersionUpdate(TopicStateRequest<RcIsBeidouVersionState> request, MessageHeaders headers) {
+        if (request.getData() == null) {
+            return;
+        }
+        log.debug("RC is_beidou_version: gateway={}, from={}, {}", request.getGateway(), request.getFrom(), request.getData());
+    }
+
+    @Override
+    public void rcRthModeUpdate(TopicStateRequest<RcRthModeState> request, MessageHeaders headers) {
+        if (request.getData() == null) {
+            return;
+        }
+        log.debug("RC rth_mode: gateway={}, from={}, {}", request.getGateway(), request.getFrom(), request.getData());
+    }
+
+    @Override
+    public void rcCapabilitySetUpdate(TopicStateRequest<RcCapabilitySetState> request, MessageHeaders headers) {
+        if (request.getData() == null) {
+            return;
+        }
+        log.debug("RC capability_set: gateway={}, from={}, {}", request.getGateway(), request.getFrom(), request.getData());
+    }
+
+    @Override
+    public void rcCommanderFlightModeUpdate(TopicStateRequest<RcCommanderFlightModeState> request, MessageHeaders headers) {
+        if (request.getData() == null) {
+            return;
+        }
+        log.debug("RC commander_flight_mode: gateway={}, from={}, {}", request.getGateway(), request.getFrom(), request.getData());
+    }
+
+    @Override
+    public void rcCommanderFlightHeightUpdate(TopicStateRequest<RcCommanderFlightHeightState> request, MessageHeaders headers) {
+        if (request.getData() == null) {
+            return;
+        }
+        log.debug("RC commander_flight_height: gateway={}, from={}, {}", request.getGateway(), request.getFrom(), request.getData());
+    }
+
+    @Override
+    public void rcCommanderModeLostActionUpdate(TopicStateRequest<RcCommanderModeLostActionState> request, MessageHeaders headers) {
+        if (request.getData() == null) {
+            return;
+        }
+        log.debug("RC commander_mode_lost_action: gateway={}, from={}, {}", request.getGateway(), request.getFrom(), request.getData());
+    }
+
+    @Override
+    public void rcCamerasUpdate(TopicStateRequest<RcCamerasState> request, MessageHeaders headers) {
+        if (request.getData() == null) {
+            return;
+        }
+        log.debug("RC cameras: gateway={}, from={}, {}", request.getGateway(), request.getFrom(), request.getData());
+    }
+
+    @Override
+    public void rcCameraWatermarkSettingsUpdate(TopicStateRequest<RcCameraWatermarkSettingsState> request, MessageHeaders headers) {
+        if (request.getData() == null) {
+            return;
+        }
+        log.debug("RC camera_watermark_settings: gateway={}, from={}, {}", request.getGateway(), request.getFrom(), request.getData());
+    }
+
+    @Override
+    public TopicStateResponse<MqttReply> rcAiBoxesUpdate(TopicStateRequest<RcAiBoxesState> request, MessageHeaders headers) {
+        log.debug("RC ai_boxes: gateway={}, from={}, needReply={}, {}", request.getGateway(), request.getFrom(), request.isNeedReply(), request.getData());
+        return new TopicStateResponse<>();
     }
 
     private void dockGoOnline(DeviceDTO gateway, DeviceDTO subDevice) {

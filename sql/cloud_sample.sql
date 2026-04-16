@@ -199,7 +199,9 @@ VALUES
 	(28, 0, 91, 0, 'M3D', NULL),
 	(29, 0, 91, 1, 'M3TD', NULL),
 	(30, 1, 80, 0, 'M3D Camera', NULL),
-	(31, 1, 81, 0, 'M3TD Camera', NULL);
+	(31, 1, 81, 0, 'M3TD Camera', NULL),
+	(32, 2, 174, 0, 'DJI RC Plus 2', 'Remote control for Matrice 4 series'),
+	(33, 0, 100, 0, 'M4D', 'Matrice 4D');
 
 
 /*!40000 ALTER TABLE `manage_device_dictionary` ENABLE KEYS */;

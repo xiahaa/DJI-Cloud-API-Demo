@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dji.sample.component.mqtt.model.EventsReceiver;
+import com.dji.sample.component.oss.model.OssConfiguration;
 import com.dji.sample.component.redis.RedisConst;
 import com.dji.sample.component.redis.RedisOpsUtils;
 import com.dji.sample.component.websocket.model.BizCodeEnum;
@@ -147,6 +148,9 @@ public class DeviceLogsServiceImpl extends AbstractLogService implements IDevice
 
     @Override
     public HttpResultResponse pushFileUpload(String username, String deviceSn, DeviceLogsCreateParam param) {
+        if (!OssConfiguration.enable) {
+            return HttpResultResponse.error("OSS is disabled; cannot start log file upload.");
+        }
         StsCredentialsResponse stsCredentials = storageService.getSTSCredentials();
         stsCredentials.getCredentials().setExpire(System.currentTimeMillis() + (stsCredentials.getCredentials().getExpire() - 60) * 1000);
         LogsUploadCredentialsDTO credentialsDTO = new LogsUploadCredentialsDTO(stsCredentials);

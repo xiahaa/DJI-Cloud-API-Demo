@@ -1,5 +1,6 @@
 package com.dji.sample.storage.controller;
 
+import com.dji.sample.component.oss.model.OssConfiguration;
 import com.dji.sample.storage.service.IStorageService;
 import com.dji.sdk.cloudapi.storage.StsCredentialsResponse;
 import com.dji.sdk.cloudapi.storage.api.IHttpStorageService;
@@ -28,6 +29,9 @@ public class StorageController implements IHttpStorageService {
      */
     @Override
     public HttpResultResponse<StsCredentialsResponse> getTemporaryCredential(String workspaceId, HttpServletRequest req, HttpServletResponse rsp) {
+        if (!OssConfiguration.enable) {
+            return HttpResultResponse.error("OSS is disabled; set oss.enable=true and configure storage to obtain temporary credentials.");
+        }
         StsCredentialsResponse stsCredentials = storageService.getSTSCredentials();
         return HttpResultResponse.success(stsCredentials);
     }

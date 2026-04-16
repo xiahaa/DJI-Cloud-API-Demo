@@ -65,6 +65,8 @@ public enum DeviceEnum {
 
     RC_PRO(DeviceDomainEnum.REMOTER_CONTROL, DeviceTypeEnum.RC_PRO, DeviceSubTypeEnum.ZERO),
 
+    RC_PLUS_2(DeviceDomainEnum.REMOTER_CONTROL, DeviceTypeEnum.RC_PLUS_2, DeviceSubTypeEnum.ZERO),
+
     DOCK(DeviceDomainEnum.DOCK, DeviceTypeEnum.DOCK, DeviceSubTypeEnum.ZERO),
 
     DOCK2(DeviceDomainEnum.DOCK, DeviceTypeEnum.DOCK2, DeviceSubTypeEnum.ZERO),
@@ -72,6 +74,10 @@ public enum DeviceEnum {
     M3D(DeviceDomainEnum.DRONE, DeviceTypeEnum.M3D, DeviceSubTypeEnum.ZERO),
 
     M3TD(DeviceDomainEnum.DRONE, DeviceTypeEnum.M3D, DeviceSubTypeEnum.ONE),
+
+    M4D(DeviceDomainEnum.DRONE, DeviceTypeEnum.M4D, DeviceSubTypeEnum.ZERO),
+
+    M4_CAMERA(DeviceDomainEnum.PAYLOAD, DeviceTypeEnum.M4_CAMERA, DeviceSubTypeEnum.ZERO),
 
     M3D_CAMERA(DeviceDomainEnum.PAYLOAD, DeviceTypeEnum.M3D_CAMERA, DeviceSubTypeEnum.ZERO),
 

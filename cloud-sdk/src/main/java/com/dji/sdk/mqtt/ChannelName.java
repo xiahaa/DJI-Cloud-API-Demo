@@ -36,6 +36,10 @@ public class ChannelName {
 
     public static final String INBOUND_STATE_RC_LIVE_STATUS = "inboundStateRcLiveStatus";
 
+    public static final String INBOUND_STATE_RC_CLOUD_CONTROL_AUTH = "inboundStateRcCloudControlAuth";
+
+    public static final String INBOUND_STATE_RC_PSDK_WIDGET_VALUES = "inboundStateRcPsdkWidgetValues";
+
     public static final String INBOUND_STATE_DOCK_LIVE_STATUS = "inboundStateDockLiveStatus";
 
     public static final String INBOUND_STATE_RC_AND_DRONE_FIRMWARE_VERSION = "inboundStateRcAndDroneFirmwareVersion";
@@ -43,6 +47,26 @@ public class ChannelName {
     public static final String INBOUND_STATE_DOCK_FIRMWARE_VERSION = "inboundStateDockFirmwareVersion";
 
     public static final String INBOUND_STATE_RC_PAYLOAD_FIRMWARE = "inboundStateRcPayloadFirmware";
+
+    public static final String INBOUND_STATE_RC_DRONE_WPMZ_VERSION = "inboundStateRcDroneWpmzVersion";
+
+    public static final String INBOUND_STATE_RC_IS_BEIDOU_VERSION = "inboundStateRcIsBeidouVersion";
+
+    public static final String INBOUND_STATE_RC_RTH_MODE = "inboundStateRcRthMode";
+
+    public static final String INBOUND_STATE_RC_CAPABILITY_SET = "inboundStateRcCapabilitySet";
+
+    public static final String INBOUND_STATE_RC_COMMANDER_FLIGHT_MODE = "inboundStateRcCommanderFlightMode";
+
+    public static final String INBOUND_STATE_RC_COMMANDER_FLIGHT_HEIGHT = "inboundStateRcCommanderFlightHeight";
+
+    public static final String INBOUND_STATE_RC_COMMANDER_MODE_LOST_ACTION = "inboundStateRcCommanderModeLostAction";
+
+    public static final String INBOUND_STATE_RC_CAMERAS = "inboundStateRcCameras";
+
+    public static final String INBOUND_STATE_RC_CAMERA_WATERMARK_SETTINGS = "inboundStateRcCameraWatermarkSettings";
+
+    public static final String INBOUND_STATE_RC_AI_BOXES = "inboundStateRcAiBoxes";
 
     public static final String INBOUND_STATE_DOCK_DRONE_WPMZ_VERSION = "inboundStateDockDroneWpmzVersion";
 

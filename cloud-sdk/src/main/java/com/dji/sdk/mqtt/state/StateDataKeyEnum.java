@@ -27,7 +27,31 @@ public enum StateDataKeyEnum {
 
     RC_LIVE_STATUS(ChannelName.INBOUND_STATE_RC_LIVE_STATUS, RcLiveStatus.class),
 
+    RC_CLOUD_CONTROL_AUTH(ChannelName.INBOUND_STATE_RC_CLOUD_CONTROL_AUTH, RcCloudControlAuthState.class),
+
+    RC_PSDK_WIDGET_VALUES(ChannelName.INBOUND_STATE_RC_PSDK_WIDGET_VALUES, RcPsdkWidgetValuesState.class),
+
     RC_PAYLOAD_FIRMWARE(ChannelName.INBOUND_STATE_RC_PAYLOAD_FIRMWARE, PayloadFirmwareVersion.class),
+
+    RC_DRONE_WPMZ_VERSION(ChannelName.INBOUND_STATE_RC_DRONE_WPMZ_VERSION, RcDroneWpmzVersion.class),
+
+    RC_IS_BEIDOU_VERSION(ChannelName.INBOUND_STATE_RC_IS_BEIDOU_VERSION, RcIsBeidouVersionState.class),
+
+    RC_RTH_MODE(ChannelName.INBOUND_STATE_RC_RTH_MODE, RcRthModeState.class),
+
+    RC_CAPABILITY_SET(ChannelName.INBOUND_STATE_RC_CAPABILITY_SET, RcCapabilitySetState.class),
+
+    RC_COMMANDER_FLIGHT_MODE(ChannelName.INBOUND_STATE_RC_COMMANDER_FLIGHT_MODE, RcCommanderFlightModeState.class),
+
+    RC_COMMANDER_FLIGHT_HEIGHT(ChannelName.INBOUND_STATE_RC_COMMANDER_FLIGHT_HEIGHT, RcCommanderFlightHeightState.class),
+
+    RC_COMMANDER_MODE_LOST_ACTION(ChannelName.INBOUND_STATE_RC_COMMANDER_MODE_LOST_ACTION, RcCommanderModeLostActionState.class),
+
+    RC_CAMERAS(ChannelName.INBOUND_STATE_RC_CAMERAS, RcCamerasState.class),
+
+    RC_CAMERA_WATERMARK_SETTINGS(ChannelName.INBOUND_STATE_RC_CAMERA_WATERMARK_SETTINGS, RcCameraWatermarkSettingsState.class),
+
+    RC_AI_BOXES(ChannelName.INBOUND_STATE_RC_AI_BOXES, RcAiBoxesState.class),
 
     DOCK_FIRMWARE_VERSION(ChannelName.INBOUND_STATE_DOCK_FIRMWARE_VERSION, DockFirmwareVersion.class),
 

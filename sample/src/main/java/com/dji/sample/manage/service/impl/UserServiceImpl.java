@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dji.sample.common.model.CustomClaim;
 import com.dji.sample.common.util.JwtUtil;
 import com.dji.sample.component.mqtt.config.MqttPropertyConfiguration;
+import com.dji.sample.component.mqtt.model.MqttClientOptions;
 import com.dji.sample.manage.dao.IUserMapper;
 import com.dji.sample.manage.model.dto.UserDTO;
 import com.dji.sample.manage.model.dto.UserListDTO;
@@ -202,12 +203,20 @@ public class UserServiceImpl implements IUserService {
         if (entity == null) {
             return null;
         }
+        // Pilot Cloud (Thing) uses these for MQTT; empty DB fields would keep Disconnect even when mqtt.BASIC is set in yml
+        MqttClientOptions basic = MqttPropertyConfiguration.getBasicClientOptions();
+        String mqttUser = StringUtils.hasText(entity.getMqttUsername())
+                ? entity.getMqttUsername()
+                : basic.getUsername();
+        String mqttPwd = StringUtils.hasText(entity.getMqttPassword())
+                ? entity.getMqttPassword()
+                : basic.getPassword();
         return UserDTO.builder()
                 .userId(entity.getUserId())
                 .username(entity.getUsername())
                 .userType(entity.getUserType())
-                .mqttUsername(entity.getMqttUsername())
-                .mqttPassword(entity.getMqttPassword())
+                .mqttUsername(mqttUser)
+                .mqttPassword(mqttPwd)
                 .mqttAddr(MqttPropertyConfiguration.getBasicMqttAddress())
                 .build();
     }

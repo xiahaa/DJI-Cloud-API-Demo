@@ -24,6 +24,32 @@ public enum RcStateDataKeyEnum {
 
     LIVE_STATUS(Set.of("live_status"), RcLiveStatus.class),
 
+    DONGLE_INFOS(Set.of("dongle_infos"), DongleInfos.class),
+
+    CLOUD_CONTROL_AUTH(Set.of("cloud_control_auth"), RcCloudControlAuthState.class),
+
+    PSDK_WIDGET_VALUES(Set.of("psdk_widget_values"), RcPsdkWidgetValuesState.class),
+
+    WPMZ_VERSION(Set.of("wpmz_version"), RcDroneWpmzVersion.class),
+
+    IS_BEIDOU_VERSION(Set.of("is_beidou_version"), RcIsBeidouVersionState.class),
+
+    RTH_MODE(Set.of("rth_mode"), RcRthModeState.class),
+
+    CAPABILITY_SET(Set.of("capability_set"), RcCapabilitySetState.class),
+
+    COMMANDER_FLIGHT_MODE(Set.of("commander_flight_mode"), RcCommanderFlightModeState.class),
+
+    COMMANDER_FLIGHT_HEIGHT(Set.of("commander_flight_height"), RcCommanderFlightHeightState.class),
+
+    COMMANDER_MODE_LOST_ACTION(Set.of("commander_mode_lost_action"), RcCommanderModeLostActionState.class),
+
+    CAMERAS(Set.of("cameras"), RcCamerasState.class),
+
+    CAMERA_WATERMARK_SETTINGS(Set.of("camera_watermark_settings"), RcCameraWatermarkSettingsState.class),
+
+    AI_BOXES(Set.of("ai_boxes"), RcAiBoxesState.class),
+
     PAYLOAD_FIRMWARE(PayloadModelConst.getAllModelWithPosition(), PayloadFirmwareVersion.class),
     ;
 

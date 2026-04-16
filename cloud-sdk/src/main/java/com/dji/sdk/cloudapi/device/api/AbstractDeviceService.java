@@ -152,6 +152,26 @@ public class AbstractDeviceService {
     }
 
     /**
+     * Cloud control authorization state for remote control
+     * @param request  data
+     * @param headers   The headers for a {@link Message}.
+     */
+    @ServiceActivator(inputChannel = ChannelName.INBOUND_STATE_RC_CLOUD_CONTROL_AUTH)
+    public void rcCloudControlAuthUpdate(TopicStateRequest<RcCloudControlAuthState> request, MessageHeaders headers) {
+        throw new UnsupportedOperationException("rcCloudControlAuthUpdate not implemented");
+    }
+
+    /**
+     * PSDK widget values state for remote control / aircraft
+     * @param request  data
+     * @param headers   The headers for a {@link Message}.
+     */
+    @ServiceActivator(inputChannel = ChannelName.INBOUND_STATE_RC_PSDK_WIDGET_VALUES)
+    public void rcPsdkWidgetValuesUpdate(TopicStateRequest<RcPsdkWidgetValuesState> request, MessageHeaders headers) {
+        throw new UnsupportedOperationException("rcPsdkWidgetValuesUpdate not implemented");
+    }
+
+    /**
      * Payload firmware version update for remote control and drone
      * @param request  data
      * @param headers   The headers for a {@link Message}.
@@ -159,6 +179,106 @@ public class AbstractDeviceService {
     @ServiceActivator(inputChannel = ChannelName.INBOUND_STATE_RC_PAYLOAD_FIRMWARE)
     public void rcPayloadFirmwareVersionUpdate(TopicStateRequest<PayloadFirmwareVersion> request, MessageHeaders headers) {
         throw new UnsupportedOperationException("rcPayloadFirmwareVersionUpdate not implemented");
+    }
+
+    /**
+     * WPMZ template version on aircraft when gateway is RC (state key {@code wpmz_version}).
+     * @param request  data
+     * @param headers   The headers for a {@link Message}.
+     */
+    @ServiceActivator(inputChannel = ChannelName.INBOUND_STATE_RC_DRONE_WPMZ_VERSION)
+    public void rcDroneWpmzVersionUpdate(TopicStateRequest<RcDroneWpmzVersion> request, MessageHeaders headers) {
+        throw new UnsupportedOperationException("rcDroneWpmzVersionUpdate not implemented");
+    }
+
+    /**
+     * BeiDou-related version flag on aircraft when gateway is RC.
+     * @param request  data
+     * @param headers   The headers for a {@link Message}.
+     */
+    @ServiceActivator(inputChannel = ChannelName.INBOUND_STATE_RC_IS_BEIDOU_VERSION)
+    public void rcIsBeidouVersionUpdate(TopicStateRequest<RcIsBeidouVersionState> request, MessageHeaders headers) {
+        throw new UnsupportedOperationException("rcIsBeidouVersionUpdate not implemented");
+    }
+
+    /**
+     * RTH mode when gateway is RC.
+     * @param request  data
+     * @param headers   The headers for a {@link Message}.
+     */
+    @ServiceActivator(inputChannel = ChannelName.INBOUND_STATE_RC_RTH_MODE)
+    public void rcRthModeUpdate(TopicStateRequest<RcRthModeState> request, MessageHeaders headers) {
+        throw new UnsupportedOperationException("rcRthModeUpdate not implemented");
+    }
+
+    /**
+     * Capability set when gateway is RC.
+     * @param request  data
+     * @param headers   The headers for a {@link Message}.
+     */
+    @ServiceActivator(inputChannel = ChannelName.INBOUND_STATE_RC_CAPABILITY_SET)
+    public void rcCapabilitySetUpdate(TopicStateRequest<RcCapabilitySetState> request, MessageHeaders headers) {
+        throw new UnsupportedOperationException("rcCapabilitySetUpdate not implemented");
+    }
+
+    /**
+     * Commander flight mode when gateway is RC.
+     * @param request  data
+     * @param headers   The headers for a {@link Message}.
+     */
+    @ServiceActivator(inputChannel = ChannelName.INBOUND_STATE_RC_COMMANDER_FLIGHT_MODE)
+    public void rcCommanderFlightModeUpdate(TopicStateRequest<RcCommanderFlightModeState> request, MessageHeaders headers) {
+        throw new UnsupportedOperationException("rcCommanderFlightModeUpdate not implemented");
+    }
+
+    /**
+     * Commander flight height when gateway is RC.
+     * @param request  data
+     * @param headers   The headers for a {@link Message}.
+     */
+    @ServiceActivator(inputChannel = ChannelName.INBOUND_STATE_RC_COMMANDER_FLIGHT_HEIGHT)
+    public void rcCommanderFlightHeightUpdate(TopicStateRequest<RcCommanderFlightHeightState> request, MessageHeaders headers) {
+        throw new UnsupportedOperationException("rcCommanderFlightHeightUpdate not implemented");
+    }
+
+    /**
+     * Commander mode lost action when gateway is RC.
+     * @param request  data
+     * @param headers   The headers for a {@link Message}.
+     */
+    @ServiceActivator(inputChannel = ChannelName.INBOUND_STATE_RC_COMMANDER_MODE_LOST_ACTION)
+    public void rcCommanderModeLostActionUpdate(TopicStateRequest<RcCommanderModeLostActionState> request, MessageHeaders headers) {
+        throw new UnsupportedOperationException("rcCommanderModeLostActionUpdate not implemented");
+    }
+
+    /**
+     * Camera state list when gateway is RC.
+     * @param request  data
+     * @param headers   The headers for a {@link Message}.
+     */
+    @ServiceActivator(inputChannel = ChannelName.INBOUND_STATE_RC_CAMERAS)
+    public void rcCamerasUpdate(TopicStateRequest<RcCamerasState> request, MessageHeaders headers) {
+        throw new UnsupportedOperationException("rcCamerasUpdate not implemented");
+    }
+
+    /**
+     * Camera watermark settings when gateway is RC.
+     * @param request  data
+     * @param headers   The headers for a {@link Message}.
+     */
+    @ServiceActivator(inputChannel = ChannelName.INBOUND_STATE_RC_CAMERA_WATERMARK_SETTINGS)
+    public void rcCameraWatermarkSettingsUpdate(TopicStateRequest<RcCameraWatermarkSettingsState> request, MessageHeaders headers) {
+        throw new UnsupportedOperationException("rcCameraWatermarkSettingsUpdate not implemented");
+    }
+
+    /**
+     * AI box list when gateway is RC; may request {@linkplain TopicStateRequest#isNeedReply() state reply}.
+     * @param request  data
+     * @param headers   The headers for a {@link Message}.
+     */
+    @ServiceActivator(inputChannel = ChannelName.INBOUND_STATE_RC_AI_BOXES, outputChannel = ChannelName.OUTBOUND_STATE)
+    public TopicStateResponse<MqttReply> rcAiBoxesUpdate(TopicStateRequest<RcAiBoxesState> request, MessageHeaders headers) {
+        throw new UnsupportedOperationException("rcAiBoxesUpdate not implemented");
     }
 
     /**

@@ -9,16 +9,16 @@ spring:
     druid:
       type: com.alibaba.druid.pool.DruidDataSource
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://cloud_api_sample_mysql:3306/cloud_sample?useSSL=false&allowPublicKeyRetrieval=true
+      url: jdbc:mysql://127.0.0.1:3306/cloud_sample?useSSL=false&allowPublicKeyRetrieval=true
       username: root
-      password: root
+      password: silas@2026
       initial-size: 10
       min-idle: 10
       max-active: 20
       max-wait: 60000
 
   redis:
-    host: cloud_api_sample_redis
+    host: 172.18.17.34
     port: 6379
     database: 0
     username: # if you enable
@@ -45,20 +45,20 @@ mqtt:
   # BASIC parameters are required.
   BASIC:
     protocol: MQTT # @see com.dji.sample.component.mqtt.model.MqttProtocolEnum
-    host: Please enter your ip.
+    host: 172.18.17.34
     port: 1883
-    username: JavaServer
-    password: 123456
+    username: pilot
+    password: pilot123
     client-id: 123456
     # If the protocol is ws/wss, this value is required.
-    path:
-  DRC:
-    protocol: WS # @see com.dji.sample.component.mqtt.model.MqttProtocolEnum
-    host: Please enter your ip.
-    port: 8083
-    path: /mqtt
-    username: JavaServer
-    password: 123456
+#    path:
+#  DRC:
+#    protocol: WS # @see com.dji.sample.component.mqtt.model.MqttProtocolEnum
+#    host: Please enter your ip.
+#    port: 8083
+#    path: /mqtt
+#    username: JavaServer
+#    password: 123456
 
 cloud-sdk:
   mqtt:
@@ -86,18 +86,34 @@ url:
     version: /api/v1
 
 # Tutorial: https://www.alibabacloud.com/help/en/object-storage-service/latest/use-a-temporary-credential-provided-by-sts-to-access-oss
+#
+# ---------- 原仓库默认 OSS 占位（阿里云），勿删：需要时注释掉下方「oss:」再取消本段 ----------
+#oss:
+#  enable: false
+#  provider: ALIYUN # @see com.dji.sample.component.OssConfiguration.model.enums.OssTypeEnum
+#  endpoint: https://oss-cn-hangzhou.aliyuncs.com
+#  access-key: Please enter your access key.
+#  secret-key: Please enter your secret key.
+#  expire: 3600
+#  region: Please enter your oss region. # cn-hangzhou
+#  role-session-name: cloudApi
+#  role-arn: Please enter your role arn. # acs:ram::123456789:role/stsrole
+#  bucket: Please enter your bucket name.
+#  object-dir-prefix: Please enter a folder name.
+# ---------- 当前启用：局域网 MinIO（控制台 http://172.18.17.34:9001 ，API :9000）----------
 oss:
-  enable: false
-  provider: ALIYUN # @see com.dji.sample.component.OssConfiguration.model.enums.OssTypeEnum
-  endpoint: https://oss-cn-hangzhou.aliyuncs.com
-  access-key: Please enter your access key.
-  secret-key: Please enter your secret key.
+  enable: true
+  provider: minio
+  endpoint: http://172.18.17.34:9000
+  # endpoint: http://127.0.0.1:9000
+  access-key: minioadmin
+  secret-key: minioadmin
   expire: 3600
-  region: Please enter your oss region. # cn-hangzhou
+  region: us-east-1
   role-session-name: cloudApi
-  role-arn: Please enter your role arn. # acs:ram::123456789:role/stsrole
-  bucket: Please enter your bucket name.
-  object-dir-prefix: Please enter a folder name.
+  role-arn: ""
+  bucket: cloud-bucket
+  object-dir-prefix: wayline
 
 #oss:
 #  enable: true
@@ -136,36 +152,58 @@ ntp:
 # To create a license for an application: https://developer.dji.com/user/apps/#all
 cloud-api:
   app:
-    id: Please enter the app id.
-    key: Please enter the app key.
-    license: Please enter the app license.
+    id: 183017
+    key: 43b4077984d2184750c76284ab26fa9
+    license: RSFkToLX77Bmx50g9n9x37ifMygrwbyZvrzhJiuERSbGgPj463HWCMbYC0oHgwAIu23KRZVs9xlhvzB+YspNKTxDE3VtglyTjZph4d0k8yJdd1dxQLMM0LyaFYNEJXUf7OB2TxOu4/UOiEE17+NL9GIS2bVKhSFmPu6kihW3VmY=
 
 livestream:
   url:
+    # 已注释：当前仅使用 RTMP
     # It is recommended to use a program to create Token. https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/java/src/main/java/io/agora/media/RtcTokenBuilder2.java
-    agora:
-      channel: Please enter the agora channel.
-      token: Please enter the agora temporary token.
-      uid:  654321
+    # agora:
+    #   channel: Please enter the agora channel.
+    #   token: Please enter the agora temporary token.
+    #   uid:  654321
 
     # RTMP  Note: This IP is the address of the streaming server. If you want to see livestream on web page, you need to convert the RTMP stream to WebRTC stream.
+    # 本地 MediaMTX path 为 live；外场请改为机场/遥控能访问的本机局域网 IP，例如 rtmp://192.168.1.100/live/
     rtmp:
-      url: Please enter the rtmp access address.  # Example: 'rtmp://192.168.1.1/live/'
-    rtsp:
-      username: Please enter the username.
-      password: Please enter the password.
-      port: 8554
+      url: 'rtmp://172.18.17.34/live/test/'  # Example: 'rtmp://192.168.1.1/live/'
+    # 已注释：当前仅使用 RTMP
+    # rtsp:
+    #   username: Please enter the username.
+    #   password: Please enter the password.
+    #   port: 8554
 
+    # 已注释：当前仅使用 RTMP
     # GB28181 Note:If you don't know what these parameters mean, you can go to Pilot2 and select the GB28181 page in the cloud platform. Where the parameters same as these parameters.
-    gb28181:
-      serverIP: Please enter the server ip.
-      serverPort: Please enter the server port.
-      serverID: Please enter the server id.
-      agentID: Please enter the agent id.
-      agentPassword: Please enter the agent password.
-      localPort: Please enter the local port.
-      channel: Please enter the channel.
+    # gb28181:
+    #   serverIP: Please enter the server ip.
+    #   serverPort: Please enter the server port.
+    #   serverID: Please enter the server id.
+    #   agentID: Please enter the agent id.
+    #   agentPassword: Please enter the agent password.
+    #   localPort: Please enter the local port.
+    #   channel: Please enter the channel.
 
+    # 已注释：当前仅使用 RTMP
     # Webrtc: Only supports using whip standard
-    whip:
-      url: Please enter the rtmp access address. #  Example：http://192.168.1.1:1985/rtc/v1/whip/?app=live&stream=
+    # whip:
+    #   url: Please enter the rtmp access address. #  Example：http://192.168.1.1:1985/rtc/v1/whip/?app=live&stream=
+
+# Pull one frame from RTMP periodically and publish raw JPEG bytes to MQTT (needs ffmpeg on PATH).
+# 开启前：1) Pilot 已在推流的地址与 rtmp-url 一致（常见 rtmp://host:1935/live/<流名>） 2) EMQX 等需允许本消息大小（JPEG 可能数百 KB）
+# 3) interval-ms 不宜过小，否则每秒起一个 ffmpeg 进程，CPU 会高
+silas:
+  live:
+    image-publisher:
+      enabled: true
+
+
+      # 与 Pilot / 推流端实际地址一致；无端口时默认 1935
+      rtmp-url: rtmp://172.18.17.34:1935/live/test/1776334209154
+      topic: silas/live/image
+      interval-ms: 1000
+      initial-delay-ms: 5000
+      qos: 0
+      ffmpeg-timeout-ms: 4000

@@ -57,11 +57,26 @@ public enum DeviceTypeEnum {
 
     RC_PRO(144),
 
+    /**
+     * DJI RC Plus 2 (e.g. Matrice 4 series). Was missing in older SDK snapshots; device reports type 174, domain 2.
+     */
+    RC_PLUS_2(174),
+
     DOCK(1),
 
     DOCK2(2),
 
     M3D(91),
+
+    /**
+     * Matrice 4D (domain=0, type=100, sub_type=0).
+     */
+    M4D(100),
+
+    /**
+     * Matrice 4 series gimbal payload camera; {@code live_capacity} reports {@code camera_index} such as {@code 98-0-0}.
+     */
+    M4_CAMERA(98),
 
     M3D_CAMERA(80),
 
