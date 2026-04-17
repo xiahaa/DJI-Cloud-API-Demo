@@ -11,6 +11,7 @@ import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.mqtt.support.MqttHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -38,7 +39,12 @@ public class EventsRouter {
                     try {
                         TopicEventsRequest data = Common.getObjectMapper().readValue((byte[]) source.getPayload(), TopicEventsRequest.class);
                         String topic = String.valueOf(source.getHeaders().get(MqttHeaders.RECEIVED_TOPIC));
-                        return data.setFrom(topic.substring((THING_MODEL_PRE + PRODUCT).length(), topic.indexOf(EVENTS_SUF)))
+                        // Topic path is thing/product/{gateway_sn}/events — handlers use getGateway() for Redis/SDK lookups.
+                        String gatewaySn = topic.substring((THING_MODEL_PRE + PRODUCT).length(), topic.indexOf(EVENTS_SUF));
+                        String payloadGateway = data.getGateway();
+                        return data.setFrom(gatewaySn)
+                                // Keep payload gateway when provided; fallback to topic gateway_sn.
+                                .setGateway(StringUtils.hasText(payloadGateway) ? payloadGateway : gatewaySn)
                                 .setData(Common.getObjectMapper().convertValue(data.getData(), EventsMethodEnum.find(data.getMethod()).getClassType()));
                     } catch (IOException e) {
                         throw new CloudSDKException(e);

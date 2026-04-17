@@ -397,6 +397,14 @@ public class SDKDeviceService extends AbstractDeviceService {
     }
 
     @Override
+    public void rcCurrentRthModeUpdate(TopicStateRequest<RcCurrentRthModeState> request, MessageHeaders headers) {
+        if (request.getData() == null) {
+            return;
+        }
+        log.debug("RC current_rth_mode: gateway={}, from={}, {}", request.getGateway(), request.getFrom(), request.getData());
+    }
+
+    @Override
     public void rcCapabilitySetUpdate(TopicStateRequest<RcCapabilitySetState> request, MessageHeaders headers) {
         if (request.getData() == null) {
             return;
@@ -410,6 +418,14 @@ public class SDKDeviceService extends AbstractDeviceService {
             return;
         }
         log.debug("RC commander_flight_mode: gateway={}, from={}, {}", request.getGateway(), request.getFrom(), request.getData());
+    }
+
+    @Override
+    public void rcCurrentCommanderFlightModeUpdate(TopicStateRequest<RcCurrentCommanderFlightModeState> request, MessageHeaders headers) {
+        if (request.getData() == null) {
+            return;
+        }
+        log.debug("RC current_commander_flight_mode: gateway={}, from={}, {}", request.getGateway(), request.getFrom(), request.getData());
     }
 
     @Override

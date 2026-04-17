@@ -36,9 +36,13 @@ public enum RcStateDataKeyEnum {
 
     RTH_MODE(Set.of("rth_mode"), RcRthModeState.class),
 
+    CURRENT_RTH_MODE(Set.of("current_rth_mode"), RcCurrentRthModeState.class),
+
     CAPABILITY_SET(Set.of("capability_set"), RcCapabilitySetState.class),
 
     COMMANDER_FLIGHT_MODE(Set.of("commander_flight_mode"), RcCommanderFlightModeState.class),
+
+    CURRENT_COMMANDER_FLIGHT_MODE(Set.of("current_commander_flight_mode"), RcCurrentCommanderFlightModeState.class),
 
     COMMANDER_FLIGHT_HEIGHT(Set.of("commander_flight_height"), RcCommanderFlightHeightState.class),
 

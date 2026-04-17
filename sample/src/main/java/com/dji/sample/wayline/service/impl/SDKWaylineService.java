@@ -28,6 +28,7 @@ import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.integration.mqtt.support.MqttHeaders;
 
 import java.net.URL;
 import java.sql.SQLException;
@@ -155,5 +156,14 @@ public class SDKWaylineService extends AbstractWaylineService {
             e.printStackTrace();
             return new TopicRequestsResponse().setData(MqttReply.error(CommonErrorEnum.SYSTEM_ERROR));
         }
+    }
+
+    @Override
+    public TopicRequestsResponse<MqttReply> inFlightTaskRequest(TopicRequestsRequest<InFlightTaskRequest> request, MessageHeaders headers) {
+        Object topic = headers.get(MqttHeaders.RECEIVED_TOPIC);
+        log.warn("[MQTT][requests] unsupported method={} topic={} gateway={} payload={}",
+                request.getMethod(), topic, request.getGateway(), request.getData());
+        return new TopicRequestsResponse<MqttReply>()
+                .setData(MqttReply.error(com.dji.sdk.common.CommonErrorEnum.STATUS_NOT_SUPPORTED));
     }
 }

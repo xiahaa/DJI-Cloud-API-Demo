@@ -182,6 +182,17 @@ public abstract class AbstractWaylineService {
     }
 
     /**
+     * In-flight task request from Pilot side.
+     * @param request data
+     * @param headers The headers for a {@link Message}.
+     * @return requests_reply
+     */
+    @ServiceActivator(inputChannel = ChannelName.INBOUND_REQUESTS_IN_FLIGHT_TASK_REQUEST, outputChannel = ChannelName.OUTBOUND_REQUESTS)
+    public TopicRequestsResponse<MqttReply> inFlightTaskRequest(TopicRequestsRequest<InFlightTaskRequest> request, MessageHeaders headers) {
+        throw new UnsupportedOperationException("inFlightTaskRequest not implemented");
+    }
+
+    /**
      * Return-to-home information
      * @param request  data
      * @param headers   The headers for a {@link Message}.

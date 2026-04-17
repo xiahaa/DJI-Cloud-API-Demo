@@ -29,9 +29,19 @@ public class DrcDownPublish {
     }
 
     public void publish(String sn, String method, Object data, int publishCount) {
+        this.publish(sn, method, data, null, publishCount);
+    }
+
+    public void publish(String sn, String method, Object data, Long seq) {
+        this.publish(sn, method, data, seq, DEFAULT_PUBLISH_COUNT);
+    }
+
+    public void publish(String sn, String method, Object data, Long seq, int publishCount) {
         String topic = TopicConst.THING_MODEL_PRE + TopicConst.PRODUCT + Objects.requireNonNull(sn) + TopicConst.DRC + TopicConst.DOWN;
         gatewayPublish.publish(topic,
                 new TopicDrcRequest<>()
+                        .setTimestamp(System.currentTimeMillis())
+                        .setSeq(seq)
                         .setMethod(method)
                         .setData(Objects.requireNonNullElse(data, "")),
                 publishCount);

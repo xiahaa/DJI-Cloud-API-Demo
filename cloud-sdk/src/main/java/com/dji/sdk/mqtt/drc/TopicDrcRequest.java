@@ -10,6 +10,7 @@ import com.dji.sdk.mqtt.CommonTopicRequest;
 public class TopicDrcRequest<T> extends CommonTopicRequest<T> {
 
     private String method;
+    private Long seq;
 
     public TopicDrcRequest() {
     }
@@ -18,6 +19,7 @@ public class TopicDrcRequest<T> extends CommonTopicRequest<T> {
     public String toString() {
         return "TopicDrcRequest{" +
                 "method='" + method + '\'' +
+                ", seq=" + seq +
                 ", tid='" + tid + '\'' +
                 ", bid='" + bid + '\'' +
                 ", timestamp=" + timestamp +
@@ -31,6 +33,15 @@ public class TopicDrcRequest<T> extends CommonTopicRequest<T> {
 
     public TopicDrcRequest<T> setMethod(String method) {
         this.method = method;
+        return this;
+    }
+
+    public Long getSeq() {
+        return seq;
+    }
+
+    public TopicDrcRequest<T> setSeq(Long seq) {
+        this.seq = seq;
         return this;
     }
 

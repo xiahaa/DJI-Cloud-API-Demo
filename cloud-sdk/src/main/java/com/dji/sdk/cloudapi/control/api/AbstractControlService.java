@@ -90,7 +90,6 @@ public abstract class AbstractControlService {
      * @param gateway
      * @return  services_reply
      */
-    @CloudSDKVersion(exclude = GatewayTypeEnum.RC)
     public TopicServicesResponse<ServicesReplyData> flightAuthorityGrab(GatewayManager gateway) {
         return servicesPublish.publish(
                 gateway.getGatewaySn(),
@@ -117,7 +116,6 @@ public abstract class AbstractControlService {
      * @param request   data
      * @return  services_reply
      */
-    @CloudSDKVersion(exclude = GatewayTypeEnum.RC)
     public TopicServicesResponse<ServicesReplyData> drcModeEnter(GatewayManager gateway, DrcModeEnterRequest request) {
         return servicesPublish.publish(
                 gateway.getGatewaySn(),
@@ -130,11 +128,29 @@ public abstract class AbstractControlService {
      * @param gateway
      * @return  services_reply
      */
-    @CloudSDKVersion(exclude = GatewayTypeEnum.RC)
     public TopicServicesResponse<ServicesReplyData> drcModeExit(GatewayManager gateway) {
         return servicesPublish.publish(
                 gateway.getGatewaySn(),
                 ControlMethodEnum.DRC_MODE_EXIT.getMethod());
+    }
+
+    /**
+     * Request RC/Pilot to authorize cloud control before entering DRC mode.
+     * @param gateway
+     * @return services_reply
+     */
+    public TopicServicesResponse<ServicesReplyData> cloudControlAuthRequest(GatewayManager gateway, CloudControlAuthRequest request) {
+        return servicesPublish.publish(
+                gateway.getGatewaySn(),
+                ControlMethodEnum.CLOUD_CONTROL_AUTH_REQUEST.getMethod(),
+                request);
+    }
+
+    /**
+     * Backward-compatible overload for integrations that do not pass auth payload.
+     */
+    public TopicServicesResponse<ServicesReplyData> cloudControlAuthRequest(GatewayManager gateway) {
+        return cloudControlAuthRequest(gateway, new CloudControlAuthRequest());
     }
 
     /**
@@ -157,12 +173,22 @@ public abstract class AbstractControlService {
      * @param request   data
      * @return  services_reply
      */
-    @CloudSDKVersion(exclude = GatewayTypeEnum.RC)
     public TopicServicesResponse<ServicesReplyData> flyToPoint(GatewayManager gateway, FlyToPointRequest request) {
         return servicesPublish.publish(
                 gateway.getGatewaySn(),
                 ControlMethodEnum.FLY_TO_POINT.getMethod(),
                 request);
+    }
+
+    /**
+     * flyto target point with custom per-attempt MQTT reply timeout (see {@link com.dji.sdk.mqtt.MqttGatewayPublish#publishWithReply}).
+     */
+    public TopicServicesResponse<ServicesReplyData> flyToPoint(GatewayManager gateway, FlyToPointRequest request, long replyTimeoutMs) {
+        return servicesPublish.publish(
+                gateway.getGatewaySn(),
+                ControlMethodEnum.FLY_TO_POINT.getMethod(),
+                request,
+                replyTimeoutMs);
     }
 
     /**

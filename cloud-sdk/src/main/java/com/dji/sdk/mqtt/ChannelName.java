@@ -54,9 +54,13 @@ public class ChannelName {
 
     public static final String INBOUND_STATE_RC_RTH_MODE = "inboundStateRcRthMode";
 
+    public static final String INBOUND_STATE_RC_CURRENT_RTH_MODE = "inboundStateRcCurrentRthMode";
+
     public static final String INBOUND_STATE_RC_CAPABILITY_SET = "inboundStateRcCapabilitySet";
 
     public static final String INBOUND_STATE_RC_COMMANDER_FLIGHT_MODE = "inboundStateRcCommanderFlightMode";
+
+    public static final String INBOUND_STATE_RC_CURRENT_COMMANDER_FLIGHT_MODE = "inboundStateRcCurrentCommanderFlightMode";
 
     public static final String INBOUND_STATE_RC_COMMANDER_FLIGHT_HEIGHT = "inboundStateRcCommanderFlightHeight";
 
@@ -124,6 +128,8 @@ public class ChannelName {
     public static final String INBOUND_REQUESTS_CONFIG = "inboundRequestsConfig";
 
     public static final String INBOUND_REQUESTS_FLIGHTTASK_RESOURCE_GET = "inboundRequestsFlightTaskResourceGet";
+
+    public static final String INBOUND_REQUESTS_IN_FLIGHT_TASK_REQUEST = "inboundRequestsInFlightTaskRequest";
 
     public static final String INBOUND_REQUESTS_FLIGHT_AREAS_GET = "inboundRequestsFlightAreasGet";
 

@@ -52,6 +52,7 @@ mqtt:
     client-id: 123456
     # If the protocol is ws/wss, this value is required.
 #    path:
+  # ---------- 以下为仓库原始 DRC 配置模板（保留为注释，勿删）----------
 #  DRC:
 #    protocol: WS # @see com.dji.sample.component.mqtt.model.MqttProtocolEnum
 #    host: Please enter your ip.
@@ -59,6 +60,19 @@ mqtt:
 #    path: /mqtt
 #    username: JavaServer
 #    password: 123456
+  # ---------- 当前环境实际启用的 DRC（解决 drc/connect 缺少 mqtt.DRC）----------
+  # 说明：与 BASIC 使用同一 EMQX（tcp 1883）时，Pilot 侧以 connect 接口返回的 address + JWT 密码为准；
+  # 若你现场 DRC 走 WebSocket，请改为注释中的 WS 形态，并同步修改 host/port/path。
+  DRC:
+    protocol: MQTT
+    host: 172.18.17.34
+    port: 1883
+    username: pilot
+    password: pilot123
+    client-id: drc-placeholder
+    # protocol: WS
+    # port: 8083
+    # path: /mqtt
 
 cloud-sdk:
   mqtt:

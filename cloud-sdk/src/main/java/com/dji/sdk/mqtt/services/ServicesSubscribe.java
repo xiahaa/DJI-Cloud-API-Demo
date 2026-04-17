@@ -20,11 +20,25 @@ public class ServicesSubscribe {
     @Resource
     private IMqttTopicService topicService;
 
-    public void subscribe(GatewayManager gateway) {
+    public void subscribe(GatewayManager gateway, boolean unsubscribeSubDevice) {
         topicService.subscribe(String.format(TOPIC, gateway.getGatewaySn()));
+        if (unsubscribeSubDevice) {
+            topicService.unsubscribe(String.format(TOPIC, gateway.getDroneSn()));
+            return;
+        }
+        if (null != gateway.getDroneSn()) {
+            topicService.subscribe(String.format(TOPIC, gateway.getDroneSn()));
+        }
+    }
+
+    public void subscribe(GatewayManager gateway) {
+        subscribe(gateway, true);
     }
 
     public void unsubscribe(GatewayManager gateway) {
         topicService.unsubscribe(String.format(TOPIC, gateway.getGatewaySn()));
+        if (null != gateway.getDroneSn()) {
+            topicService.unsubscribe(String.format(TOPIC, gateway.getDroneSn()));
+        }
     }
 }

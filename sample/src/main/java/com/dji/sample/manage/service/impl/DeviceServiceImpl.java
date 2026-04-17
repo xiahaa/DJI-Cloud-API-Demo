@@ -166,7 +166,7 @@ public class DeviceServiceImpl implements IDeviceService {
         statusSubscribe.subscribe(gateway);
         stateSubscribe.subscribe(gateway, true);
         osdSubscribe.subscribe(gateway, true);
-        servicesSubscribe.subscribe(gateway);
+        servicesSubscribe.subscribe(gateway, true);
         eventsSubscribe.subscribe(gateway, true);
         requestsSubscribe.subscribe(gateway);
         propertySetSubscribe.subscribe(gateway);
@@ -177,7 +177,7 @@ public class DeviceServiceImpl implements IDeviceService {
         statusSubscribe.subscribe(gateway);
         stateSubscribe.subscribe(gateway, false);
         osdSubscribe.subscribe(gateway, false);
-        servicesSubscribe.subscribe(gateway);
+        servicesSubscribe.subscribe(gateway, false);
         eventsSubscribe.subscribe(gateway, false);
         requestsSubscribe.subscribe(gateway);
         propertySetSubscribe.subscribe(gateway);

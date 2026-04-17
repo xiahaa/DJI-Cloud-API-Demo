@@ -15,6 +15,8 @@ public enum ControlMethodEnum {
 
     DRC_MODE_EXIT("drc_mode_exit"),
 
+    CLOUD_CONTROL_AUTH_REQUEST("cloud_control_auth_request"),
+
     FLY_TO_POINT("fly_to_point"),
 
     FLY_TO_POINT_STOP("fly_to_point_stop"),
@@ -64,6 +66,8 @@ public enum ControlMethodEnum {
     CAMERA_POINT_FOCUS_ACTION("camera_point_focus_action"),
 
     DRONE_CONTROL("drone_control"),
+
+    STICK_CONTROL("stick_control"),
 
     DRONE_EMERGENCY_STOP("drone_emergency_stop"),
 

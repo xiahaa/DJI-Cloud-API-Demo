@@ -8,6 +8,7 @@ import com.dji.sdk.cloudapi.organization.AirportBindStatusRequest;
 import com.dji.sdk.cloudapi.organization.AirportOrganizationBindRequest;
 import com.dji.sdk.cloudapi.organization.AirportOrganizationGetRequest;
 import com.dji.sdk.cloudapi.wayline.FlighttaskResourceGetRequest;
+import com.dji.sdk.cloudapi.wayline.InFlightTaskRequest;
 import com.dji.sdk.mqtt.ChannelName;
 
 import java.util.Arrays;
@@ -28,6 +29,8 @@ public enum RequestsMethodEnum {
     AIRPORT_ORGANIZATION_GET("airport_organization_get", ChannelName.INBOUND_REQUESTS_AIRPORT_ORGANIZATION_GET, AirportOrganizationGetRequest.class),
 
     FLIGHT_TASK_RESOURCE_GET("flighttask_resource_get", ChannelName.INBOUND_REQUESTS_FLIGHTTASK_RESOURCE_GET, FlighttaskResourceGetRequest.class),
+
+    IN_FLIGHT_TASK_REQUEST("in_flight_task_request", ChannelName.INBOUND_REQUESTS_IN_FLIGHT_TASK_REQUEST, InFlightTaskRequest.class),
 
     CONFIG("config", ChannelName.INBOUND_REQUESTS_CONFIG, RequestsConfigRequest.class),
 

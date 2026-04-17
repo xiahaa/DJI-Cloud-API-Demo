@@ -212,6 +212,16 @@ public class AbstractDeviceService {
     }
 
     /**
+     * Current RTH mode when gateway is RC.
+     * @param request  data
+     * @param headers   The headers for a {@link Message}.
+     */
+    @ServiceActivator(inputChannel = ChannelName.INBOUND_STATE_RC_CURRENT_RTH_MODE)
+    public void rcCurrentRthModeUpdate(TopicStateRequest<RcCurrentRthModeState> request, MessageHeaders headers) {
+        throw new UnsupportedOperationException("rcCurrentRthModeUpdate not implemented");
+    }
+
+    /**
      * Capability set when gateway is RC.
      * @param request  data
      * @param headers   The headers for a {@link Message}.
@@ -229,6 +239,16 @@ public class AbstractDeviceService {
     @ServiceActivator(inputChannel = ChannelName.INBOUND_STATE_RC_COMMANDER_FLIGHT_MODE)
     public void rcCommanderFlightModeUpdate(TopicStateRequest<RcCommanderFlightModeState> request, MessageHeaders headers) {
         throw new UnsupportedOperationException("rcCommanderFlightModeUpdate not implemented");
+    }
+
+    /**
+     * Current commander flight mode when gateway is RC.
+     * @param request  data
+     * @param headers   The headers for a {@link Message}.
+     */
+    @ServiceActivator(inputChannel = ChannelName.INBOUND_STATE_RC_CURRENT_COMMANDER_FLIGHT_MODE)
+    public void rcCurrentCommanderFlightModeUpdate(TopicStateRequest<RcCurrentCommanderFlightModeState> request, MessageHeaders headers) {
+        throw new UnsupportedOperationException("rcCurrentCommanderFlightModeUpdate not implemented");
     }
 
     /**

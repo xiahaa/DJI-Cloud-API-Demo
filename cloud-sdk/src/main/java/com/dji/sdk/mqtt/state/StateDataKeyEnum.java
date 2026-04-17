@@ -39,9 +39,13 @@ public enum StateDataKeyEnum {
 
     RC_RTH_MODE(ChannelName.INBOUND_STATE_RC_RTH_MODE, RcRthModeState.class),
 
+    RC_CURRENT_RTH_MODE(ChannelName.INBOUND_STATE_RC_CURRENT_RTH_MODE, RcCurrentRthModeState.class),
+
     RC_CAPABILITY_SET(ChannelName.INBOUND_STATE_RC_CAPABILITY_SET, RcCapabilitySetState.class),
 
     RC_COMMANDER_FLIGHT_MODE(ChannelName.INBOUND_STATE_RC_COMMANDER_FLIGHT_MODE, RcCommanderFlightModeState.class),
+
+    RC_CURRENT_COMMANDER_FLIGHT_MODE(ChannelName.INBOUND_STATE_RC_CURRENT_COMMANDER_FLIGHT_MODE, RcCurrentCommanderFlightModeState.class),
 
     RC_COMMANDER_FLIGHT_HEIGHT(ChannelName.INBOUND_STATE_RC_COMMANDER_FLIGHT_HEIGHT, RcCommanderFlightHeightState.class),
 
