@@ -27,6 +27,7 @@ import com.dji.sdk.common.HttpResultResponse;
 import com.dji.sdk.common.SDKManager;
 import com.dji.sdk.mqtt.TopicConst;
 import com.dji.sdk.mqtt.drc.DrcDownPublish;
+import com.dji.sdk.mqtt.drc.TopicDrcRequest;
 import com.dji.sdk.mqtt.services.ServicesReplyData;
 import com.dji.sdk.mqtt.services.TopicServicesResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -34,7 +35,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -49,6 +49,9 @@ import java.util.UUID;
  *
  * <p>Official Pilot-to-Cloud topics use {@code thing/product/{gateway_sn}/...}; here
  * {@code gateway_sn} is the RC gateway serial — the same value as HTTP body {@code rc_sn}.</p>
+ * @see <a href="https://developer.dji.com/doc/cloud-api-tutorial/cn/api-reference/pilot-to-cloud/mqtt/dji-rc-plus-2/drc.html">DJI 上云 API - RC Plus 2 - DRC</a>
+ * @see <a href="https://developer.dji.com/doc/cloud-api-tutorial/cn/api-reference/pilot-to-cloud/mqtt/dji-rc-plus-2/remote-control.html">DJI 上云 API - RC Plus 2 - remote control</a>
+ * @author Saly C
  */
 @Service
 @Slf4j
@@ -271,6 +274,11 @@ public class RcPlus2ControlServiceImpl implements IRcPlus2ControlService {
                 request.getPitch(),
                 request.getThrottle(),
                 request.getYaw());
+        TopicDrcRequest<StickControlRequest> drcPayload = new TopicDrcRequest<StickControlRequest>()
+                .setMethod(ControlMethodEnum.STICK_CONTROL.getMethod())
+                .setSeq(seq)
+                .setData(request);
+        log.info("[RC-CTRL][stick_control] payload={}", toJsonForLog(drcPayload));
 
         drcDownPublish.publish(gatewaySn, ControlMethodEnum.STICK_CONTROL.getMethod(), request, seq);
         log.info("[RC-CTRL][stick_control] dispatched gateway_sn={}, seq={}", gatewaySn, seq);
