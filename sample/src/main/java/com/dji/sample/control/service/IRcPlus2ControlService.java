@@ -3,7 +3,9 @@ package com.dji.sample.control.service;
 import com.dji.sample.control.model.dto.JwtAclDTO;
 import com.dji.sample.control.model.param.RcPlus2DrcConnectParam;
 import com.dji.sample.control.model.param.RcPlus2DrcEnterParam;
+import com.dji.sample.control.model.param.RcPlus2FlyToPointActionsParam;
 import com.dji.sample.control.model.param.RcPlus2FlyToPointParam;
+import com.dji.sample.control.model.param.RcPlus2OsdLatestParam;
 import com.dji.sample.control.model.param.RcPlus2YawControlParam;
 import com.dji.sdk.cloudapi.control.DrcModeMqttBroker;
 import com.dji.sdk.common.HttpResultResponse;
@@ -53,6 +55,15 @@ public interface IRcPlus2ControlService {
     HttpResultResponse flyToPoint(String workspaceId, RcPlus2FlyToPointParam param);
 
     /**
+     * Convert action list to target point and trigger fly_to_point.
+     *
+     * @param workspaceId workspace id from request path
+     * @param param actions transform parameter
+     * @return unified http response
+     */
+    HttpResultResponse flyToPointByActions(String workspaceId, RcPlus2FlyToPointActionsParam param);
+
+    /**
      * Send DRC joystick command for yaw adjustment.
      *
      * @param workspaceId workspace id from request path
@@ -60,4 +71,13 @@ public interface IRcPlus2ControlService {
      * @return unified http response
      */
     HttpResultResponse yawControl(String workspaceId, RcPlus2YawControlParam param);
+
+    /**
+     * Get latest one-shot /osd payload from target aircraft device_sn.
+     *
+     * @param workspaceId workspace id from request path
+     * @param param query parameter
+     * @return latest osd data
+     */
+    HttpResultResponse latestOsd(String workspaceId, RcPlus2OsdLatestParam param);
 }

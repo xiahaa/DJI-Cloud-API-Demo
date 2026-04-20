@@ -9,11 +9,13 @@ import com.dji.sample.manage.service.IDeviceRedisService;
 import com.dji.sdk.cloudapi.control.*;
 import com.dji.sdk.cloudapi.control.api.AbstractControlService;
 import com.dji.sdk.mqtt.MqttReply;
+import com.dji.sdk.mqtt.TopicConst;
 import com.dji.sdk.mqtt.events.TopicEventsRequest;
 import com.dji.sdk.mqtt.events.TopicEventsResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.integration.mqtt.support.MqttHeaders;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +38,9 @@ public class SDKControlService extends AbstractControlService {
 
     @Autowired
     private ObjectMapper mapper;
+
+    @Autowired
+    private RcPlus2DrcOsdWaitService rcPlus2DrcOsdWaitService;
 
     @Override
     public TopicEventsResponse<MqttReply> flyToPointProgress(TopicEventsRequest<FlyToPointProgress> request, MessageHeaders headers) {
@@ -114,5 +119,26 @@ public class SDKControlService extends AbstractControlService {
                         .message(eventsReceiver.getReason().getMessage())
                         .result(eventsReceiver.getReason().getVal()).build());
         return new TopicEventsResponse<MqttReply>().setData(MqttReply.success());
+    }
+
+    @Override
+    public void osdInfoPush(com.dji.sdk.mqtt.drc.TopicDrcRequest<OsdInfoPush> request, MessageHeaders headers) {
+        String topic = String.valueOf(headers.get(MqttHeaders.RECEIVED_TOPIC));
+        String prefix = TopicConst.THING_MODEL_PRE + TopicConst.PRODUCT;
+        int upIdx = topic.indexOf(TopicConst.DRC + TopicConst.UP);
+        if (upIdx <= prefix.length()) {
+            log.warn("[RC-DRC][osd_info_push] invalid topic={}, method={}, seq={}, data={}",
+                    topic, request.getMethod(), request.getSeq(), request.getData());
+            return;
+        }
+        String gatewaySn = topic.substring(prefix.length(), upIdx);
+        rcPlus2DrcOsdWaitService.publish(gatewaySn, request.getData());
+        try {
+            log.info("[RC-DRC][osd_info_push] received topic={}, gateway_sn={}, method={}, seq={}, data={}",
+                    topic, gatewaySn, request.getMethod(), request.getSeq(), mapper.writeValueAsString(request.getData()));
+        } catch (Exception ex) {
+            log.info("[RC-DRC][osd_info_push] received topic={}, gateway_sn={}, method={}, seq={}, data={}",
+                    topic, gatewaySn, request.getMethod(), request.getSeq(), request.getData());
+        }
     }
 }

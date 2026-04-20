@@ -303,7 +303,52 @@ curl -sS -X POST 'http://172.18.17.34:6789/control/api/v1/pilot/rc-plus-2/worksp
 
 ---
 
-## 2.5 退出 DRC 模式
+## 2.5 获取当前 OSD 信息（device /osd）
+
+- **Method**: `POST`
+- **Path**: `http://172.18.17.34:6789/control/api/v1/pilot/rc-plus-2/workspaces/{workspace_id}/flight/osd/latest`
+- **说明**:
+  - 接口调用后，临时等待下一条飞机 `device_sn` 对应 Topic `thing/product/{device_sn}/osd` 上报（默认超时 10s）
+  - 收到后立即返回，不做持久缓存
+  - 需要同时传 `rc_sn`（用于 DRC 会话归属校验）和 `device_sn`（用于订阅 OSD 主题）
+  - 返回值直接为 MQTT 上报中的 `data` 整体对象
+- **官方协议说明（OSD Topic）**：[DJI 上云 API — RC Plus 2 DRC — DRC 高频 OSD 信息上报](https://developer.dji.com/doc/cloud-api-tutorial/cn/api-reference/pilot-to-cloud/mqtt/dji-rc-plus-2/drc.html#drc-%E9%AB%98%E9%A2%91-osd-%E4%BF%A1%E6%81%AF%E4%B8%8A%E6%8A%A5)（摘录见文末 **[附录 C](#appendix-c-drc-osd-info-push)**）。
+
+### 请求头
+
+```http
+x-auth-token: <登录后 data.access_token，见 1.4>
+Content-Type: application/json
+```
+
+### 请求体
+
+```json
+{
+  "client_id": "postman-rc2-001",
+  "rc_sn": "RCPLUS2_SN_EXAMPLE",
+  "device_sn": "AIRCRAFT_SN_EXAMPLE",
+  "wait_timeout_ms": 10000
+}
+```
+
+### 字段说明
+
+- `device_sn`：必填，飞机 SN，用于匹配 `thing/product/{device_sn}/osd`。
+- `wait_timeout_ms`：可选，等待下一条 `/osd` 的超时时间（毫秒），范围 `[1000, 30000]`；不传默认 `10000`。
+
+### cURL（本地终端）
+
+```bash
+curl -sS -X POST 'http://172.18.17.34:6789/control/api/v1/pilot/rc-plus-2/workspaces/'"${WORKSPACE_ID}"'/flight/osd/latest' \
+  -H 'x-auth-token: '"${TOKEN}" \
+  -H 'Content-Type: application/json' \
+  -d '{"client_id":"'"${CLIENT_ID}"'","rc_sn":"'"${RC_SN}"'","device_sn":"'"${DEVICE_SN}"'","wait_timeout_ms":10000}'
+```
+
+---
+
+## 2.6 退出 DRC 模式
 
 - **Method**: `POST`
 - **Path**: `http://172.18.17.34:6789/control/api/v1/pilot/rc-plus-2/workspaces/{workspace_id}/drc/exit`
@@ -337,6 +382,82 @@ curl -sS -X POST 'http://172.18.17.34:6789/control/api/v1/pilot/rc-plus-2/worksp
 
 ---
 
+## 2.7 飞向目标点（actions 变形）
+
+- **Method**: `POST`
+- **Path**: `http://172.18.17.34:6789/control/api/v1/pilot/rc-plus-2/workspaces/{workspace_id}/flight/fly-to-point-by-actions`
+- **说明**:
+  - 入参给动作序列 `actions`，服务端在 `delay_ms` 后读取当前 OSD（`heading/latitude/longitude/height`）
+  - OSD 读取 Topic 为 `thing/product/{device_sn}/osd`，因此该接口新增 `device_sn`
+  - `data.attitude_head` 来源范围是 `[-180, 180]`，服务端会先转换为 `[0, 360)` 再参与动作计算（机头 0 度，右侧 `(0,180]`，左侧 `[-180,0)`）
+  - 按动作序列计算新的目标经纬度；目标高度使用入参 `height`（不传默认 `145`）
+  - 内部复用现有 `fly_to_point` 下发链路（topic/method 与 `2.3` 一致）
+
+### 请求头
+
+```http
+x-auth-token: <登录后 data.access_token，见 1.4>
+Content-Type: application/json
+```
+
+### 请求体
+
+```json
+{
+  "client_id": "postman-rc2-001",
+  "rc_sn": "RCPLUS2_SN_EXAMPLE",
+  "device_sn": "AIRCRAFT_SN_EXAMPLE",
+  "max_speed": 3,
+  "height": 145,
+  "delay_ms": 0,
+  "wait_timeout_ms": 10000,
+  "actions": [
+    {
+      "operator": 2,
+      "value": 15
+    },
+    {
+      "operator": 1,
+      "value": 10
+    }
+  ]
+}
+```
+
+### 字段说明
+
+- `operator`：
+  - `1`：向前（`value` 单位：米）
+  - `2`：左旋转（`value` 单位：度）
+  - `3`：右旋转（`value` 单位：度）
+- `device_sn`：必填，飞机 SN，用于读取 `thing/product/{device_sn}/osd`。
+- `height`：可选，`fly_to_point` 的目标高度，范围 `[20, 500]`；不传默认 `145`。
+- `delay_ms`：读取当前 OSD 前的延时；`0` 表示不延时
+- `wait_timeout_ms`：等待下一条 `/osd` 的超时（毫秒），范围 `[1000, 30000]`
+
+### cURL（本地终端）
+
+```bash
+curl -sS -X POST 'http://172.18.17.34:6789/control/api/v1/pilot/rc-plus-2/workspaces/'"${WORKSPACE_ID}"'/flight/fly-to-point-by-actions' \
+  -H 'x-auth-token: '"${TOKEN}" \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "client_id":"'"${CLIENT_ID}"'",
+    "rc_sn":"'"${RC_SN}"'",
+    "device_sn":"'"${DEVICE_SN}"'",
+    "max_speed":3,
+    "height":145,
+    "delay_ms":0,
+    "wait_timeout_ms":10000,
+    "actions":[
+      {"operator":2,"value":15},
+      {"operator":1,"value":10}
+    ]
+  }'
+```
+
+---
+
 ## 3. Postman 变量建议
 
 建议在 Postman 环境中配置：
@@ -345,6 +466,7 @@ curl -sS -X POST 'http://172.18.17.34:6789/control/api/v1/pilot/rc-plus-2/worksp
 - `token`：登录后 token
 - `workspaceId`：工作空间 ID
 - `rcSn`：RC Plus 2 SN
+- `deviceSn`：飞机 `device_sn`
 - `clientId`：例如 `postman-rc2-001`
 
 ---
@@ -549,3 +671,56 @@ export CLIENT_ID='postman-rc2-001'
   }
 }
 ```
+
+---
+
+<a id="appendix-c-drc-osd-info-push"></a>
+
+## 附录 C. DRC 高频 OSD 信息上报（官方摘录 · 备查）
+
+以下内容对应 RC Plus 2 官方文档章节“DRC 高频 OSD 信息上报”，用于对照 `2.5` 的最新 OSD 查询接口。  
+若与官网更新不一致，请以在线文档为准：  
+[DJI 上云 API - RC Plus 2 - DRC 高频 OSD 信息上报](https://developer.dji.com/doc/cloud-api-tutorial/cn/api-reference/pilot-to-cloud/mqtt/dji-rc-plus-2/drc.html#drc-%E9%AB%98%E9%A2%91-osd-%E4%BF%A1%E6%81%AF%E4%B8%8A%E6%8A%A5)
+
+**Topic**：`thing/product/{gateway_sn}/drc/up`  
+**Direction**：up  
+**Method**：`osd_info_push`
+
+**Data：**
+
+| Column | Name | Type | constraint | Description |
+| --- | --- | --- | --- | --- |
+| attitude_head | 飞行器姿态 head 角 | double | {"unit_name":"度 / °"} | 飞行器姿态 head 角 |
+| latitude | 飞行器纬度 | double | {"unit_name":"度 / °"} | |
+| longitude | 飞行器经度 | double | {"unit_name":"度 / °"} | |
+| height | 飞行器高度 | double | {"unit_name":"度 / °"} | 飞行器海拔高度 |
+| speed_x | 当前飞行器 x 坐标方向的速度 | double | {"unit_name":"米每秒 / m/s"} | 当前飞行器 x 坐标方向的速度 |
+| speed_y | 当前飞行器 y 坐标方向的速度 | double | {"unit_name":"米每秒 / m/s"} | 当前飞行器 y 坐标方向的速度 |
+| speed_z | 当前飞行器 z 坐标方向的速度 | double | {"unit_name":"米每秒 / m/s"} | |
+| gimbal_pitch | 云台 pitch 角 | double | {"unit_name":"度 / °"} | |
+| gimbal_roll | 云台 roll 角 | double | {"unit_name":"度 / °"} | |
+| gimbal_yaw | 云台 yaw 角 | double | {"unit_name":"度 / °"} | |
+
+**Example（官方示例）：**
+
+```json
+{
+	"data": {
+		"attitude_head": 60,
+		"gimbal_pitch": 60,
+		"gimbal_roll": 60,
+		"gimbal_yaw": 60,
+		"height": 10,
+		"latitude": 10,
+		"longitude": 10,
+		"speed_x": 10,
+		"speed_y": 10,
+		"speed_z": 10
+	},
+	"timestamp": 1670415891013
+}
+```
+
+**本仓库接口映射说明：**
+- `2.5` 在调用时临时等待一条 `thing/product/{device_sn}/osd`，收到后返回 `data` 整体对象，不额外拼装字段。
+- `2.7` 读取 `data.attitude_head` 后会先把 `[-180, 180]` 归一化到 `[0, 360)`，再执行动作序列换算。

@@ -6,6 +6,7 @@ import com.dji.sample.manage.model.dto.DeviceDTO;
 import com.dji.sample.manage.model.dto.DevicePayloadReceiver;
 import com.dji.sample.manage.model.enums.DeviceFirmwareStatusEnum;
 import com.dji.sample.manage.model.param.DeviceQueryParam;
+import com.dji.sample.control.service.impl.RcPlus2DrcOsdWaitService;
 import com.dji.sample.manage.service.IDeviceDictionaryService;
 import com.dji.sample.manage.service.IDevicePayloadService;
 import com.dji.sample.manage.service.IDeviceRedisService;
@@ -57,6 +58,9 @@ public class SDKDeviceService extends AbstractDeviceService {
 
     @Autowired
     private IDevicePayloadService devicePayloadService;
+
+    @Autowired
+    private RcPlus2DrcOsdWaitService rcPlus2DrcOsdWaitService;
 
     @Override
     public TopicStatusResponse<MqttReply> updateTopoOnline(TopicStatusRequest<UpdateTopo> request, MessageHeaders headers) {
@@ -228,6 +232,7 @@ public class SDKDeviceService extends AbstractDeviceService {
         deviceRedisService.setDeviceOnline(device);
 
         OsdRcDrone data = request.getData();
+        rcPlus2DrcOsdWaitService.publish(from, data);
         deviceService.pushOsdDataToPilot(device.getWorkspaceId(), from,
                 new DeviceOsdHost()
                         .setLatitude(data.getLatitude())

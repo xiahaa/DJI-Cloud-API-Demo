@@ -9,10 +9,14 @@ import com.dji.sample.control.model.enums.MqttAclAccessEnum;
 import com.dji.sample.control.model.param.RcPlus2DrcConnectParam;
 import com.dji.sample.control.model.param.RcPlus2DrcEnterParam;
 import com.dji.sample.control.model.enums.DroneAuthorityEnum;
+import com.dji.sample.control.model.param.RcPlus2FlyToPointActionsParam;
 import com.dji.sample.control.model.param.RcPlus2FlyToPointParam;
+import com.dji.sample.control.model.param.RcPlus2OsdLatestParam;
 import com.dji.sample.control.model.param.RcPlus2YawControlParam;
 import com.dji.sample.control.service.IControlService;
 import com.dji.sample.control.service.IRcPlus2ControlService;
+import com.dji.sample.control.service.utils.RcPlus2FlyToPointActionUtils;
+import com.dji.sdk.cloudapi.device.OsdRcDrone;
 import com.dji.sample.manage.model.dto.DeviceDTO;
 import com.dji.sample.manage.service.IDeviceRedisService;
 import com.dji.sdk.cloudapi.control.ControlMethodEnum;
@@ -20,6 +24,8 @@ import com.dji.sdk.cloudapi.control.CloudControlAuthRequest;
 import com.dji.sdk.cloudapi.control.DrcModeEnterRequest;
 import com.dji.sdk.cloudapi.control.DrcModeMqttBroker;
 import com.dji.sdk.cloudapi.control.FlyToPointRequest;
+import com.dji.sdk.cloudapi.control.OsdInfoPush;
+import com.dji.sdk.cloudapi.control.Point;
 import com.dji.sdk.cloudapi.control.StickControlRequest;
 import com.dji.sdk.cloudapi.control.api.AbstractControlService;
 import com.dji.sdk.cloudapi.device.DeviceDomainEnum;
@@ -35,6 +41,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.TimeUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -61,24 +70,29 @@ public class RcPlus2ControlServiceImpl implements IRcPlus2ControlService {
      * RC fly_to_point may need user confirmation on Pilot; default SDK wait (3s per attempt) is often too short.
      */
     private static final long RC_FLY_TO_POINT_REPLY_TIMEOUT_MS = 15_000L;
+    private static final long RC_OSD_WAIT_TIMEOUT_MS = 10_000L;
     private static final int DRC_LINK_REFUSED_CODE = 514304;
+    private static final float DEFAULT_ACTIONS_TARGET_HEIGHT = 145F;
 
     private final ObjectMapper objectMapper;
     private final AbstractControlService abstractControlService;
     private final DrcDownPublish drcDownPublish;
     private final IDeviceRedisService deviceRedisService;
     private final IControlService controlService;
+    private final RcPlus2DrcOsdWaitService rcPlus2DrcOsdWaitService;
 
     public RcPlus2ControlServiceImpl(ObjectMapper objectMapper,
                                      AbstractControlService abstractControlService,
                                      DrcDownPublish drcDownPublish,
                                      IDeviceRedisService deviceRedisService,
-                                     IControlService controlService) {
+                                     IControlService controlService,
+                                     RcPlus2DrcOsdWaitService rcPlus2DrcOsdWaitService) {
         this.objectMapper = objectMapper;
         this.abstractControlService = abstractControlService;
         this.drcDownPublish = drcDownPublish;
         this.deviceRedisService = deviceRedisService;
         this.controlService = controlService;
+        this.rcPlus2DrcOsdWaitService = rcPlus2DrcOsdWaitService;
     }
 
     /**
@@ -247,6 +261,45 @@ public class RcPlus2ControlServiceImpl implements IRcPlus2ControlService {
         return HttpResultResponse.success();
     }
 
+    @Override
+    public HttpResultResponse flyToPointByActions(String workspaceId, RcPlus2FlyToPointActionsParam param) {
+        log.info("[RC-CTRL][fly_to_point_actions] start workspaceId={}, rcSn={}, deviceSn={}, clientId={}, maxSpeed={}, actionsCount={}, delayMs={}, waitTimeoutMs={}, targetHeight={}",
+                workspaceId,
+                param.getRcSn(),
+                param.getDeviceSn(),
+                param.getClientId(),
+                param.getMaxSpeed(),
+                param.getActions() == null ? 0 : param.getActions().size(),
+                param.getDelayMs(),
+                param.getWaitTimeoutMs(),
+                Objects.requireNonNullElse(param.getHeight(), DEFAULT_ACTIONS_TARGET_HEIGHT));
+        DeviceDTO rc = validateDrcOwnership(param.getRcSn(), param.getClientId());
+        String gatewaySn = gatewaySnOrThrow(rc, param.getRcSn());
+        verifyRequestedDeviceSn(rc, param.getDeviceSn());
+        ensureFlightAuthority(gatewaySn);
+
+        OsdRcDrone currentOsd = fetchCurrentOsdAfterDelay(param.getActions(), param.getDeviceSn(), param.getDelayMs(), param.getWaitTimeoutMs());
+        float normalizedHead = normalizeAttitudeHeadTo360(
+                Objects.requireNonNull(currentOsd.getAttitudeHead(), "Missing attitude_head from /osd data."));
+        Point point = RcPlus2FlyToPointActionUtils.calculatePointByActions(
+                param.getActions(),
+                normalizedHead,
+                Objects.requireNonNull(currentOsd.getLatitude(), "Missing latitude from /osd data."),
+                Objects.requireNonNull(currentOsd.getLongitude(), "Missing longitude from /osd data."),
+                Objects.requireNonNull(currentOsd.getHeight(), "Missing height from /osd data."));
+        float targetHeight = Objects.requireNonNullElse(param.getHeight(), DEFAULT_ACTIONS_TARGET_HEIGHT);
+        point.setHeight(targetHeight);
+        log.info("[RC-CTRL][fly_to_point_actions] computed target gateway_sn={}, device_sn={}, point={}",
+                gatewaySn, param.getDeviceSn(), toJsonForLog(point));
+
+        RcPlus2FlyToPointParam flyToPointParam = new RcPlus2FlyToPointParam();
+        flyToPointParam.setClientId(param.getClientId());
+        flyToPointParam.setRcSn(param.getRcSn());
+        flyToPointParam.setMaxSpeed(param.getMaxSpeed());
+        flyToPointParam.setPoints(List.of(point));
+        return flyToPoint(workspaceId, flyToPointParam);
+    }
+
     /**
      * Publish DRC stick_control command and use the yaw channel to adjust heading.
      */
@@ -283,6 +336,62 @@ public class RcPlus2ControlServiceImpl implements IRcPlus2ControlService {
         drcDownPublish.publish(gatewaySn, ControlMethodEnum.STICK_CONTROL.getMethod(), request, seq);
         log.info("[RC-CTRL][stick_control] dispatched gateway_sn={}, seq={}", gatewaySn, seq);
         return HttpResultResponse.success();
+    }
+
+    @Override
+    public HttpResultResponse latestOsd(String workspaceId, RcPlus2OsdLatestParam param) {
+        log.info("[RC-CTRL][osd_latest] start workspaceId={}, rcSn={}, deviceSn={}, clientId={}",
+                workspaceId, param.getRcSn(), param.getDeviceSn(), param.getClientId());
+        DeviceDTO rc = validateDrcOwnership(param.getRcSn(), param.getClientId());
+        gatewaySnOrThrow(rc, param.getRcSn());
+        verifyRequestedDeviceSn(rc, param.getDeviceSn());
+        String osdTopic = TopicConst.THING_MODEL_PRE + TopicConst.PRODUCT + param.getDeviceSn() + TopicConst.OSD_SUF;
+        long waitTimeoutMs = Objects.requireNonNullElse(param.getWaitTimeoutMs(), RC_OSD_WAIT_TIMEOUT_MS);
+        log.info("[RC-CTRL][osd_latest] wait next topic={} device_sn={} timeoutMs={}",
+                osdTopic, param.getDeviceSn(), waitTimeoutMs);
+        Object osdData;
+        try {
+            osdData = rcPlus2DrcOsdWaitService.awaitNext(param.getDeviceSn(), waitTimeoutMs);
+        } catch (TimeoutException ex) {
+            log.warn("[RC-CTRL][osd_latest] timeout waiting /osd. device_sn={}, topic={}, timeoutMs={}",
+                    param.getDeviceSn(), osdTopic, waitTimeoutMs);
+            return HttpResultResponse.error("No /osd message received within " + waitTimeoutMs + "ms for device_sn=" + param.getDeviceSn());
+        }
+        log.info("[RC-CTRL][osd_latest] success device_sn={}, topic={}, data={}",
+                param.getDeviceSn(), osdTopic, toJsonForLog(osdData));
+        return HttpResultResponse.success(osdData);
+    }
+
+    private OsdRcDrone fetchCurrentOsdAfterDelay(List<RcPlus2FlyToPointActionsParam.Action> actions,
+                                                  String deviceSn,
+                                                  Long delayMs,
+                                                  Long waitTimeoutMs) {
+        long actualDelayMs = Objects.requireNonNullElse(delayMs, 0L);
+        long actualWaitTimeoutMs = Objects.requireNonNullElse(waitTimeoutMs, RC_OSD_WAIT_TIMEOUT_MS);
+        if (actualDelayMs > 0) {
+            log.info("[RC-CTRL][fly_to_point_actions] delay before /osd wait device_sn={}, delayMs={}", deviceSn, actualDelayMs);
+            try {
+                TimeUnit.MILLISECONDS.sleep(actualDelayMs);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("Interrupted before waiting /osd message.", ex);
+            }
+        }
+        String osdTopic = TopicConst.THING_MODEL_PRE + TopicConst.PRODUCT + deviceSn + TopicConst.OSD_SUF;
+        log.info("[RC-CTRL][fly_to_point_actions] wait next /osd device_sn={}, topic={}, timeoutMs={}, actions={}",
+                deviceSn, osdTopic, actualWaitTimeoutMs, toJsonForLog(actions));
+        Object osdData;
+        try {
+            osdData = rcPlus2DrcOsdWaitService.awaitNext(deviceSn, actualWaitTimeoutMs);
+        } catch (TimeoutException ex) {
+            throw new RuntimeException("No /osd message received within " + actualWaitTimeoutMs + "ms for device_sn=" + deviceSn);
+        }
+        OsdRcDrone currentOsd = osdData instanceof OsdRcDrone
+                ? (OsdRcDrone) osdData
+                : objectMapper.convertValue(osdData, OsdRcDrone.class);
+        log.info("[RC-CTRL][fly_to_point_actions] got /osd device_sn={}, data={}",
+                deviceSn, toJsonForLog(currentOsd));
+        return currentOsd;
     }
 
     /**
@@ -325,6 +434,24 @@ public class RcPlus2ControlServiceImpl implements IRcPlus2ControlService {
             throw new RuntimeException("DRC session is occupied by another client.");
         }
         return rc;
+    }
+
+    private void verifyRequestedDeviceSn(DeviceDTO rc, String requestDeviceSn) {
+        String linkedDeviceSn = rc.getChildDeviceSn();
+        if (!StringUtils.hasText(linkedDeviceSn)) {
+            throw new RuntimeException("No aircraft linked to this RC. Connect aircraft before reading /osd.");
+        }
+        if (!Objects.equals(linkedDeviceSn, requestDeviceSn)) {
+            throw new RuntimeException("device_sn does not match RC linked aircraft. linked=" + linkedDeviceSn + ", request=" + requestDeviceSn);
+        }
+    }
+
+    private static float normalizeAttitudeHeadTo360(float attitudeHead) {
+        float normalized = attitudeHead % 360F;
+        if (normalized < 0F) {
+            normalized += 360F;
+        }
+        return normalized;
     }
 
     /**
